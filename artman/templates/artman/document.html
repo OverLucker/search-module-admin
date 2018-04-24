@@ -1,17 +1,22 @@
 
 <div class="row mb-2 mt-2 border-bottom">
-
-  <div class="col-sm-8 col-lg-8">
-    <a href="{{ document.file.url }}">{{ document.title }}</a>
-  </div>
-  {% if add %}
-  <div class="col-sm-4 col-lg-4 text-right">
-    <button class="btn btn-success">+</button>
-  </div>
-  {% endif %}
-  {% if remove %}
-  <div class="col-sm-4 col-lg-4 text-right">
-    <div class="btn btn-success">-</div>
-  </div>
-  {% endif %}
+  <form class="form-inline w-100 my-2 my-lg-0" action="." method="post">
+    {% csrf_token %}
+    <input type="hidden" name="article" value="{{ document.id }}">
+    <div class="col-sm-8 col-lg-8">
+      <a href="{{ document.file.url }}">{{ document.title }}</a>
+    </div>
+    {% if add %}
+    <div class="col-sm-4 col-lg-4 text-right">
+      <input type="hidden" name="add" value="1">
+      <button type="submit" class="btn btn-success">+</button>
+    </div>
+    {% endif %}
+    {% if remove %}
+    <div class="col-sm-4 col-lg-4 text-right">
+      <input type="hidden" name="remove" value="1">
+      <button type="submit" class="btn btn-success">-</button>
+    </div>
+    {% endif %}
+  </form>
 </div>

@@ -16,7 +16,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.views.generic import TemplateView
-from artman.views import index_view, register_view, home_view
+from artman.views import (
+    index_view, register_view, home_view, moderator_view, authenticate_view
+)
 from django.contrib.auth import views as authviews
 from django.conf.urls.static import static
 from django.conf import settings
@@ -26,8 +28,9 @@ urlpatterns = [
     path('', index_view, name='index_page'),
     path('home/', home_view, name='homepage'),
     path('register/', register_view, name='register'),
-    path('login/', authviews.LoginView.as_view(template_name='artman/index.html'), name='login'),
+    path('login/', authenticate_view, name='login'),
     path('logout/', authviews.LogoutView.as_view(next_page='logout_success'), name='logout'),
     path('bye/', TemplateView.as_view(template_name='artman/bye.html'), name='logout_success'),
+    path('moderate/', moderator_view, name='moderate_page'),
     path('admin/', admin.site.urls),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
