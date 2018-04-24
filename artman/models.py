@@ -1,5 +1,8 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
+# FIXME: set Document
+from artman.models_anton import Document
 
 
 class DirAccess(models.Model):
@@ -21,3 +24,23 @@ class DirAccess(models.Model):
         on_delete=models.CASCADE
     )
     permissions = models.IntegerField(choices=PERMISSION_CHOICES)
+
+
+class BookShelf(models.Model):
+    # class Meta:
+    #     verbose_name =
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+
+    article = models.ForeignKey(
+        Document,
+        on_delete=models.CASCADE
+    )
+
+    taccess = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return "Article %s" % (self.article, )

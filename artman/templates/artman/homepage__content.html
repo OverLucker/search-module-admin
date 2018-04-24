@@ -1,0 +1,20 @@
+<div class="row">
+  <h1>Мои книги и статьи</h1>
+</div>
+<div id="user_data">
+  {% for book in bookshelf %}
+  {% include 'artman/document.html' with document=book.article remove=True %}
+  {% empty %}
+  <div class="row">
+    <h3>Вы пока не добавили ни одной книги или статьи</h3>
+  </div>
+  {% endfor %}
+</div>
+{% if docs %}
+<div class="row">
+  <h1>Еще:</h1>
+</div>
+{% endif %}
+{% for document in docs %}
+  {% include 'artman/document.html' with document=document add=True%}
+{% endfor %}

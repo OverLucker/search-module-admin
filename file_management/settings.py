@@ -55,7 +55,7 @@ ROOT_URLCONF = 'file_management.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -100,7 +100,8 @@ DATABASES = {
 #     },
 # ]
 LOGIN_REDIRECT_URL = 'homepage'
-
+LOGIN_URL = 'login'
+FILE_STORAGE_PATH = os.path.join(BASE_DIR, 'files')
 
 
 # Internationalization
@@ -121,3 +122,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'file')
+MEDIA_URL = '/storage/'
