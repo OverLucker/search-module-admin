@@ -3,7 +3,7 @@ from artman.forms import UserCreationForm, AuthenticationForm
 from django.conf import settings
 from django.apps import apps
 from django.contrib.auth.decorators import login_required, user_passes_test
-from artman.models import BookShelf, Document
+from artman.models import BookShelf, Document, StudentGroup
 from django.db.models import Q
 from django.contrib.auth import authenticate, login
 from artman.forms import SearchDocumentForm
@@ -97,17 +97,21 @@ class ModeratorView(LoginRequiredMixin, UserPassesTestMixin, View):
         return self.request.user.is_staff
 
     def get(self, request):
-        data = BookShelf.objects.all() \
-                                .select_related() \
-                                .order_by('user__username', 'article__title')
+        UserModel = apps.get_model(settings.AUTH_USER_MODEL)
+        if request.user.is_superuser:
+            init_filter = UserModel.objects.all()
+        else:
+            students = StudentGroup.objects.filter(prof=request.user).select_related()
+            studs = map(lambda x: x.stud.pk, students)
+            init_filter = UserModel.objects.filter(pk__in=studs)
 
         def get_full_data():
-            for user, docs in groupby(data, key=lambda x: x.user.username):
-                docs, docs_copy = tee(docs)
-                first = next(docs)
-                books_pk = map(lambda x: x.article.pk, docs_copy)
+
+            for user in init_filter.order_by('username'):
+                docs = BookShelf.objects.filter(user=user).select_related()
+                books_pk = map(lambda x: x.article.pk, docs)
                 adocs = Document.objects.exclude(pk__in=list(books_pk))
-                yield first.user, chain([first], docs), adocs
+                yield user, docs, adocs
 
         return render(request, 'artman/moderation.html', {
             'user': request.user,
