@@ -1,5 +1,5 @@
-from django.shortcuts import render, redirect
-from artman.forms import CustomUserCreationForm, CustomAuthenticationForm
+from django.shortcuts import render, redirect, get_object_or_404
+from artman.forms import UserCreationForm, AuthenticationForm
 from django.conf import settings
 from django.apps import apps
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -7,6 +7,9 @@ from artman.models import BookShelf, Document
 from django.db.models import Q
 from django.contrib.auth import authenticate, login
 from artman.forms import SearchDocumentForm
+from itertools import groupby, tee, chain
+from django.views import View
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 
 def index_view(request):
@@ -14,8 +17,8 @@ def index_view(request):
         return redirect('homepage')
     return render(request, 'artman/index.html', {
         'user': request.user,
-        'creationform': CustomUserCreationForm(),
-        'authform': CustomAuthenticationForm(),
+        'creationform': UserCreationForm(),
+        'authform': AuthenticationForm(),
     })
 
 
@@ -32,7 +35,7 @@ def authenticate_view(request):
 
 def register_view(request):
     if request.method == 'POST' and not request.user.is_authenticated:
-        creationform = CustomUserCreationForm(request.POST)
+        creationform = UserCreationForm(request.POST)
         if creationform.is_valid():
             UserModel = apps.get_model(settings.AUTH_USER_MODEL)
             data = {
@@ -43,23 +46,22 @@ def register_view(request):
 
         return render(request, 'artman/index.html', {
             'creationform': creationform,
-            'authform': CustomAuthenticationForm(request.POST)
+            'authform': AuthenticationForm(request.POST)
         })
 
     return redirect('index_page')
 
 
-@login_required
-def home_view(request):
-    user_books = BookShelf.objects.filter(user=request.user)
-    if user_books.exists():
-        # FIXME:
-        books = list(map(lambda x: x.article.pk, user_books))
-        docs = Document.objects.exclude(pk__in=books)
-    else:
-        docs = Document.objects.all()
-    sform = SearchDocumentForm()
-    if request.method == 'GET':
+class HomeView(LoginRequiredMixin, View):
+
+    def get(self, request):
+        user_books = BookShelf.objects.filter(user=request.user).select_related()
+        if user_books.exists():
+            books = list(map(lambda x: x.article.pk, user_books))
+            docs = Document.objects.exclude(pk__in=books)
+        else:
+            docs = Document.objects.all()
+
         sform = SearchDocumentForm(request.GET)
         if sform.is_valid():
             query = sform.cleaned_data.get('search')
@@ -67,7 +69,14 @@ def home_view(request):
             user_books = user_books.filter(article__title__contains=query)
             docs = docs.filter(q)
 
-    if request.method == 'POST':
+        return render(request, 'artman/homepage.html', {
+            'user': request.user,
+            'sform': sform,
+            'docs': docs,
+            'bookshelf': user_books,
+        })
+
+    def post(self, request):
         art_id = request.POST.get('article', '-1')
         article = Document.objects.get(pk=art_id)
         add = request.POST.get('add', False)
@@ -80,17 +89,44 @@ def home_view(request):
         if remove and not add and check.exists():
             check.first().delete()
 
-        return redirect('homepage')
-
-    return render(request, 'artman/homepage.html', {
-        'user': request.user,
-        'sform': sform,
-        'docs': docs,
-        'bookshelf': user_books,
-    })
+        return self.get(request)
 
 
-@login_required
-@user_passes_test(lambda user: user.is_staff)
-def moderator_view(request):
-    return redirect('homepage')
+class ModeratorView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def get(self, request):
+        data = BookShelf.objects.all() \
+                                .select_related() \
+                                .order_by('user__username', 'article__title')
+
+        def get_full_data():
+            for user, docs in groupby(data, key=lambda x: x.user.username):
+                docs, docs_copy = tee(docs)
+                first = next(docs)
+                books_pk = map(lambda x: x.article.pk, docs_copy)
+                adocs = Document.objects.exclude(pk__in=list(books_pk))
+                yield first.user, chain([first], docs), adocs
+
+        return render(request, 'artman/moderation.html', {
+            'user': request.user,
+            'moderated': get_full_data(),
+        })
+
+    def post(self, request):
+        apk = request.POST.get('article', '-1')
+        article = get_object_or_404(Document, pk=apk)
+        upk = request.POST.get('user', '-1')
+        UserModel = apps.get_model(settings.AUTH_USER_MODEL)
+        user = get_object_or_404(UserModel, pk=upk)
+        remove = request.POST.get('remove', False)
+        add = request.POST.get('add', False)
+        check = BookShelf.objects.filter(user=user).filter(article=article)
+
+        if add and not remove and not check.exists():
+            BookShelf.objects.create(user=user, article=article)
+
+        if remove and not add and check.exists():
+            check.first().delete()
+        return self.get(request)

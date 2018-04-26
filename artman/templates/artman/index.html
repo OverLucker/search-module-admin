@@ -4,6 +4,22 @@
     <meta charset="utf-8">
     <title>{% block title %}Тестовая страница{% endblock %}</title>
      <link href="http://netdna.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" rel="stylesheet">
+     <style media="screen">
+       div.m-auto > button[type="submit"] {
+         box-sizing: border-box;
+         padding: 0px;
+         width: 30px;
+         height: 30px;
+       }
+       .glyphicon-plus::before {
+         content: "+";
+         font-weight: bold;
+       }
+       .glyphicon-minus::before {
+         content: "-";
+         font-weight: bold;
+       }
+     </style>
     {% block css %}
     {% endblock %}
   </head>
@@ -31,27 +47,61 @@
         <span>Welcome {{ user.username }}</span>
         <a class="nav-link" href="{% url 'logout' %}">Log out</a>
         {% else %}
-        <a href="nav-link" href="{% url 'login' %}">Log In</a>
+        <a class="nav-link" href="{% url 'login' %}">Log In</a>
         {% endif %}
 
       </div>
     </nav>
     {% block content %}
-    <div class="">
-      <h1>Sign Up</h1>
-      <form class="" action="{% url 'register' %}" method="post">
-        {% csrf_token %}
-        {{ creationform.as_p }}
-        <button type="submit" name="button">Sign Up</button>
-      </form>
-    </div>
-    <div class="">
-      <h1>Sign In</h1>
-      <form class="" action="{% url 'login' %}" method="post">
-        {% csrf_token %}
-        {{ authform.as_p }}
-        <button type="submit" name="button">Sign In</button>
-      </form>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6 col-lg-6">
+          <h1>Зарегистрироваться</h1>
+          <form class="" action="{% url 'register' %}" method="post">
+            {% csrf_token %}
+            <div class="form-group row">
+              <label class="col-md-5 col-lg-3" for="">Имя пользователя: </label>
+              <div class="col-md-7 col-lg-9">
+                {{ creationform.username }}
+              </div>
+            </div>
+
+            <div class="form-group row">
+              <label class="col-md-5 col-lg-3" for="">Пароль: </label>
+              <div class="col-md-7 col-lg-9">
+                {{ creationform.password1 }}
+              </div>
+            </div>
+            <div class="form-group row">
+              <label class="col-md-5 col-lg-3" for="">Пароль повторить: </label>
+              <div class="col-md-7 col-lg-9">
+                {{ creationform.password2 }}
+              </div>
+            </div>
+            <button class="btn btn-primary" type="submit" name="button">Зарегистрироваться</button>
+          </form>
+        </div>
+
+        <div class="col-md-6 col-lg-6">
+          <h1>Войти в систему</h1>
+          <form class="" action="{% url 'login' %}" method="post">
+            {% csrf_token %}
+            <div class="form-group row">
+              <label class="col-md-5 col-lg-3" for="">Имя пользователя: </label>
+              <div class="col-md-7 col-lg-9">
+                {{ authform.username }}
+              </div>
+            </div>
+            <div class="form-group row">
+              <label class="col-md-5 col-lg-3" for="">Пароль: </label>
+              <div class="col-md-7 col-lg-9">
+                {{ authform.password }}
+              </div>
+            </div>
+            <button class="btn btn-primary" type="submit" name="button">Войти</button>
+          </form>
+        </div>
+      </div>
     </div>
     {% endblock %}
     {% block js %}

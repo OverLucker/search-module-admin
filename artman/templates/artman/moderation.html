@@ -1,0 +1,42 @@
+{% extends 'artman/index.html' %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-4 col-lg-4"><h3>Пользователь</h3></div>
+    <div class="col-md-8 col-lg-8"><h3>Сохранёнки</h3></div>
+  </div>
+
+  {% for u, docs, adocs in moderated %}
+  <div class="row mb-2 border-bottom">
+    <div class="col-md-4 col-lg-4">{{ u }}</div>
+    <div class="col-md-8 col-lg-8">
+      <div class="container">
+        {% for d in docs %}
+        {% include 'artman/document.html' with document=d.article user=d.user remove=True %}
+        {% endfor %}
+        {% if adocs %}
+        <form class="row" action="." method="post">
+          {% csrf_token %}
+          <input type="hidden" name="user" value="{{ u.pk }}">
+          <input type="hidden" name="add" value="1">
+          <div class="my-2 col-md-11 col-lg-11">
+            <select class="form-control" name="article">
+              {% for ad in adocs %}
+              <option value="{{ ad.pk }}">{{ ad.title }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-1 col-lg-1 m-auto">
+            <button class="btn btn-success fas fa-plus" type="submit" name="button"/>
+          </div>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+  {% endfor %}
+
+</div>
+{% endblock %}

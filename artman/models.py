@@ -42,5 +42,20 @@ class BookShelf(models.Model):
 
     taccess = models.DateTimeField(default=timezone.now)
 
-    def __str__(self):
-        return "Article %s" % (self.article, )
+
+class StudentGroup(models.Model):
+    prof = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='proffessors'
+    )
+
+    stud = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='students'
+    )
+
+    start = models.DateTimeField(
+        default=timezone.now
+    )
