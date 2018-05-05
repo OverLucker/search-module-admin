@@ -1,5 +1,8 @@
 from django.contrib import admin
-from artman.models import BookShelf, StudentGroup, PromoteRequest
+from artman.models import (
+    BookShelf, StudentGroup, PromoteRequest, PupilsRequest
+)
+from django.contrib.auth.models import Group
 from artman.models_anton import Document
 from django.utils.html import mark_safe
 from django.urls import reverse
@@ -46,7 +49,6 @@ class PromoteRequestAdmin(admin.ModelAdmin):
     promote.short_description = "удовлетворить"
 
     def get_urls(self):
-        print('gettings urls')
         from django.urls import path
         default = super().get_urls()
         custom = [
@@ -54,14 +56,19 @@ class PromoteRequestAdmin(admin.ModelAdmin):
             self.admin_site.admin_view(self.promote_view),
             name='{}_{}_promote-user'.format(self.model._meta.app_label, self.model._meta.model_name))
         ]
-        print(default + custom)
         return default + custom
 
     def promote_view(self, request, obj_id):
         obj = self.get_object(request, obj_id)
         if obj and not obj.user.is_staff:
             obj.user.is_staff = True
+            obj.user.groups.add(Group.objects.get(name='Профессоры'))
             obj.user.save()
             obj.delete()
             messages.info(request, 'User {} promoted'.format(obj.user))
         return redirect('admin:%s_%s_changelist' % (obj._meta.app_label,  obj._meta.model_name))
+
+
+@admin.register(PupilsRequest)
+class PupilsRequestAdmin(admin.ModelAdmin):
+    list_display = ('prof', 'stud', 'start', 'end', 'status')

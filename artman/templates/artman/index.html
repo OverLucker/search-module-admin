@@ -40,6 +40,9 @@
           <li class="nav-item">
             <a class="nav-link" href="{% url 'moderate_page' %}">Модерировать</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'pupilrequest_page' %}">Обучение</a>
+          </li>
           {% else %}
             {% if request.user.is_authenticated %}
             <li class="nav-item">

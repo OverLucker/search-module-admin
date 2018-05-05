@@ -4,7 +4,8 @@ from django.conf import settings
 from django.apps import apps
 from django.contrib.auth.decorators import login_required, user_passes_test
 from artman.models import (
-    BookShelf, Document, StudentGroup, PromoteRequest, get_full_data
+    BookShelf, Document, StudentGroup, PromoteRequest, PupilsRequest,
+    get_prof_data, get_stud_data
 )
 from django.db.models import Q
 from django.contrib.auth import authenticate, login
@@ -119,7 +120,8 @@ class ModeratorView(LoginRequiredMixin, UserPassesTestMixin, View):
             init_filter = UserModel.objects.filter(pk__in=studs)
 
         return render(request, 'artman/moderation.html', {
-            'moderated': get_full_data(init_filter),
+            'moderated': get_prof_data(init_filter.filter(is_staff=True)),
+            'moderated_stud': get_stud_data(init_filter.filter(is_staff=False)),
         })
 
     def post(self, request):
@@ -138,6 +140,16 @@ class ModeratorView(LoginRequiredMixin, UserPassesTestMixin, View):
         if remove and not add and check.exists():
             check.first().delete()
         return self.get(request)
+
+
+class PupilRequestView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def get(self, request):
+        return render(request, 'artman/pupilrequest.html', {
+            'requests': PupilsRequest.objects.filter(prof=request.user)
+        })
 
 
 def promote_view(request):

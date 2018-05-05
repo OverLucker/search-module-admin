@@ -5,8 +5,7 @@ from django.utils import timezone
 from artman.models_anton import Document
 
 
-def get_full_data(user_set):
-
+def get_prof_data(user_set):
     for user in user_set.order_by('username'):
         docs = BookShelf.objects.filter(user=user).select_related()
         books_pk = map(lambda x: x.article.pk, docs)
@@ -14,25 +13,12 @@ def get_full_data(user_set):
         yield user, docs, adocs
 
 
-class DirAccess(models.Model):
-    class Meta:
-        verbose_name = "Доступ к директории"
-        verbose_name_plural = "Доступ к директории"
-
-    PERMISSION_CHOICES = (
-        (1, "чтение"),
-        (2, "запись"),
-        (3, "чтение и запись"),
-        (4, "удаление"),
-        (7, "чтение, запись и удаление"),
-    )
-
-    dirname = models.CharField(max_length=25)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE
-    )
-    permissions = models.IntegerField(choices=PERMISSION_CHOICES)
+def get_stud_data(user_set):
+    for user in user_set.order_by('username'):
+        docs = BookShelf.objects.filter(user=user).select_related()
+        books_pk = map(lambda x: x.article.pk, docs)
+        adocs = Document.objects.exclude(pk__in=list(books_pk))
+        yield user, docs, adocs
 
 
 class BookShelf(models.Model):
@@ -71,7 +57,47 @@ class StudentGroup(models.Model):
 
 
 class PromoteRequest(models.Model):
+    class Meta:
+        app_label = 'auth'
+        verbose_name = 'запрос на повышение'
+        verbose_name_plural = 'запросы на повышение'
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
+    )
+
+
+class PupilsRequest(models.Model):
+    STATUS_CHOICES = (
+        ('wait', 'ожидание'),
+        ('accept', 'принято'),
+        ('reject', 'отказано'),
+    )
+    prof = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='request_proffessors'
+    )
+
+    stud = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='request_students'
+    )
+
+    start = models.DateTimeField(
+        default=timezone.now
+    )
+
+    end = models.DateTimeField(
+        blank=True,
+        null=True,
+        default=None
+    )
+
+    status = models.CharField(
+        max_length=6,
+        choices=STATUS_CHOICES,
+        default=STATUS_CHOICES[0][0]
     )
