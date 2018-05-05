@@ -5,6 +5,15 @@ from django.utils import timezone
 from artman.models_anton import Document
 
 
+def get_full_data(user_set):
+
+    for user in user_set.order_by('username'):
+        docs = BookShelf.objects.filter(user=user).select_related()
+        books_pk = map(lambda x: x.article.pk, docs)
+        adocs = Document.objects.exclude(pk__in=list(books_pk))
+        yield user, docs, adocs
+
+
 class DirAccess(models.Model):
     class Meta:
         verbose_name = "Доступ к директории"
@@ -58,4 +67,11 @@ class StudentGroup(models.Model):
 
     start = models.DateTimeField(
         default=timezone.now
+    )
+
+
+class PromoteRequest(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
     )

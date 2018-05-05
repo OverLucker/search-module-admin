@@ -40,6 +40,12 @@
           <li class="nav-item">
             <a class="nav-link" href="{% url 'moderate_page' %}">Модерировать</a>
           </li>
+          {% else %}
+            {% if request.user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'promote_request' %}">Запрос на модерацию</a>
+            </li>
+            {% endif %}
           {% endif %}
 
         </ul>
@@ -52,6 +58,19 @@
 
       </div>
     </nav>
+    {% block messages %}
+    {% if messages %}
+    <div class="container mt-2">
+      <div class="row">
+        <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+          {% for message in messages %}
+          <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    {% endblock %}
     {% block content %}
     <div class="container">
       <div class="row">
