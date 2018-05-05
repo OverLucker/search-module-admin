@@ -2,6 +2,12 @@
 {% block title %}Bye{% endblock %}
 
 {% block content %}
-  <h1>Bye</h1>
-  <h2>Back to <a href="{% url 'index_page' %}">home page</a></h2>
+<div class="container">
+  <div class="row">
+    <div class="col-12 col-sm-12 col-md-8 col-lg-6 mx-auto text-center">
+      <h1>До свидания</h1>
+      <h2>Вернуться на <a href="{% url 'homepage' %}">главную страницу</a></h2>
+    </div>
+  </div>
+</div>
 {% endblock %}

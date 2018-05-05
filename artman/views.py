@@ -12,44 +12,51 @@ from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 
-def index_view(request):
-    if request.user.is_authenticated:
-        return redirect('homepage')
-    return render(request, 'artman/index.html', {
-        'user': request.user,
-        'creationform': UserCreationForm(),
-        'authform': AuthenticationForm(),
-    })
-
-
-def authenticate_view(request):
-    if request.method == 'POST' and not request.user.is_authenticated:
-        username = request.POST.get('username', None)
-        password = request.POST.get('password', None)
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
+class LoginView(View):
+    def get(self, request):
+        if request.user.is_authenticated:
             return redirect('homepage')
-    return redirect('index_page')
-
-
-def register_view(request):
-    if request.method == 'POST' and not request.user.is_authenticated:
-        creationform = UserCreationForm(request.POST)
-        if creationform.is_valid():
-            UserModel = apps.get_model(settings.AUTH_USER_MODEL)
-            data = {
-                'username': creationform.cleaned_data['username'],
-                'password': creationform.cleaned_data['password1'],
-            }
-            UserModel.objects.create_user(**data)
 
         return render(request, 'artman/index.html', {
-            'creationform': creationform,
-            'authform': AuthenticationForm(request.POST)
+            'user': request.user,
+            'authform': AuthenticationForm(),
+            })
+
+    def post(self, request):
+        if not request.user.is_authenticated:
+            username = request.POST.get('username', None)
+            password = request.POST.get('password', None)
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('homepage')
+        return self.get(request)
+
+
+class RegisterView(View):
+
+    def get(self, request):
+        creationform = UserCreationForm(request.POST)
+        return render(request, 'artman/register.html', {
+            'creationform': creationform
         })
 
-    return redirect('index_page')
+    def post(self, request):
+        if not request.user.is_authenticated:
+            creationform = UserCreationForm(request.POST)
+            if creationform.is_valid():
+                UserModel = apps.get_model(settings.AUTH_USER_MODEL)
+                data = {
+                    'username': creationform.cleaned_data['username'],
+                    'password': creationform.cleaned_data['password1'],
+                }
+                UserModel.objects.create_user(**data)
+                user = authenticate(request, **data)
+                if user is not None:
+                    login(request, user)
+                    return redirect('homepage')
+
+        return self.get(request)
 
 
 class HomeView(LoginRequiredMixin, View):
@@ -70,7 +77,6 @@ class HomeView(LoginRequiredMixin, View):
             docs = docs.filter(q)
 
         return render(request, 'artman/homepage.html', {
-            'user': request.user,
             'sform': sform,
             'docs': docs,
             'bookshelf': user_books,
@@ -114,7 +120,6 @@ class ModeratorView(LoginRequiredMixin, UserPassesTestMixin, View):
                 yield user, docs, adocs
 
         return render(request, 'artman/moderation.html', {
-            'user': request.user,
             'moderated': get_full_data(),
         })
 

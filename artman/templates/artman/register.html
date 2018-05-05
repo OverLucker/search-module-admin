@@ -1,0 +1,35 @@
+{% extends 'artman/index.html' %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12 col-sm-12 col-md-8 col-lg-6">
+      <h1>Зарегистрироваться</h1>
+      <form class="" action="{% url 'register' %}" method="post">
+        {% csrf_token %}
+        <div class="form-group row">
+          <label class="col-md-5 col-lg-3" for="">Имя пользователя: </label>
+          <div class="col-md-7 col-lg-9">
+            {{ creationform.username }}
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <label class="col-md-5 col-lg-3" for="">Пароль: </label>
+          <div class="col-md-7 col-lg-9">
+            {{ creationform.password1 }}
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-md-5 col-lg-3" for="">Пароль повторить: </label>
+          <div class="col-md-7 col-lg-9">
+            {{ creationform.password2 }}
+          </div>
+        </div>
+        <button class="btn btn-primary" type="submit" name="button">Зарегистрироваться</button>
+        <span>или <a href="{% url 'login' %}">Войти</a></span>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
