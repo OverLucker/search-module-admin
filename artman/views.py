@@ -52,6 +52,8 @@ class RegisterView(View):
             if creationform.is_valid():
                 UserModel = apps.get_model(settings.AUTH_USER_MODEL)
                 data = {
+                    'first_name': creationform.cleaned_data['first_name'],
+                    'last_name': creationform.cleaned_data['last_name'],
                     'username': creationform.cleaned_data['username'],
                     'password': creationform.cleaned_data['password1'],
                 }

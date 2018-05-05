@@ -46,6 +46,24 @@ class UserCreationForm(forms.Form):
             })
     )
 
+    first_name = forms.CharField(max_length=30,
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'имя'
+            }
+        )
+    )
+
+    last_name = forms.CharField(max_length=150,
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'фамилия'
+            }
+        )
+    )
+
 
 class SearchDocumentForm(forms.Form):
     search = forms.CharField(max_length=100, required=False,
