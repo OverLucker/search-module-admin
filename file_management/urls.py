@@ -17,7 +17,8 @@ from django.contrib import admin
 from django.urls import path
 from django.views.generic import TemplateView
 from artman.views import (
-    LoginView, RegisterView, HomeView, ModeratorView, PupilRequestView, promote_view
+    LoginView, RegisterView, HomeView, ModeratorView, PupilRequestView,
+    StudentsView, promote_view
 )
 from django.contrib.auth import views as authviews
 from django.conf.urls.static import static
@@ -32,6 +33,7 @@ urlpatterns = [
     path('bye/', TemplateView.as_view(template_name='artman/bye.html'), name='logout_success'),
     path('moderate/', ModeratorView.as_view(), name='moderate_page'),
     path('promote/', promote_view, name='promote_request'),
-    path('requests/', PupilRequestView.as_view(), name='pupilrequest_page'),
+    path('instructors/', PupilRequestView.as_view(), name='pupilrequest_page'),
+    path('students/', StudentsView.as_view(), name='studentsrequest_page'),
     path('admin/', admin.site.urls),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

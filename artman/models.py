@@ -101,3 +101,15 @@ class PupilsRequest(models.Model):
         choices=STATUS_CHOICES,
         default=STATUS_CHOICES[0][0]
     )
+
+    def finish_success(self):
+        StudentGroup.objects.create(prof=self.prof, stud=self.stud)
+        self._finish('accept')
+
+    def finish_fail(self):
+        self._finish('reject')
+
+    def _finish(self, status):
+        self.status = status
+        self.end = timezone.now()
+        self.save()

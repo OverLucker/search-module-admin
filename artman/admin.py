@@ -72,3 +72,4 @@ class PromoteRequestAdmin(admin.ModelAdmin):
 @admin.register(PupilsRequest)
 class PupilsRequestAdmin(admin.ModelAdmin):
     list_display = ('prof', 'stud', 'start', 'end', 'status')
+    list_filter = ('status', )

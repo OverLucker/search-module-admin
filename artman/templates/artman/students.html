@@ -1,0 +1,22 @@
+{% extends 'artman/index.html' %}
+
+{% block content %}
+<div class="container">
+  {% if studs %}
+  <div class="row">
+    <h4 class="col-12 col-sm-12 col-md-12 col-lg-12">Студенты</h4>
+  </div>
+  {% for s in studs %}
+  {% include 'artman/studentform.html' with user=s.stud remove=True %}
+  {% endfor %}
+  {% endif %}
+  {% if requests %}
+  <div class="row">
+    <h4 class="col-12 col-sm-12 col-md-12 col-lg-12">Запросы на обучение:</h4>
+  </div>
+  {% for r in requests %}
+    {% include 'artman/studentform.html' with user=r.stud reject=True add=True %}
+  {% endfor %}
+  {% endif %}
+</div>
+{% endblock %}

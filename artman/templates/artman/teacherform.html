@@ -1,0 +1,25 @@
+<div class="row mb-2 border-bottom">
+  <form class="form-inline w-100 my-2 my-lg-1" action="." method="post">
+    {% csrf_token %}
+    <input type="hidden" name="proff" value="{{ user.pk }}">
+    <div class="col-md-3 col-lg-3 border-right">
+      <span>{{ user.username }}</span>
+    </div>
+    <div class="col-md-4 col-lg-4">
+      <span>{{ user.first_name }}</span>
+    </div>
+    <div class="col-md-4 col-lg-4">
+      <span>{{ user.last_name }}</span>
+    </div>
+    <div class="col-md-1 col-lg-1 m-auto">
+      {% if add %}
+        <input type="hidden" name="add" value="1">
+        <button type="submit" class="btn btn-success glyphicon glyphicon-plus"></button>
+      {% endif %}
+      {% if remove %}
+        <input type="hidden" name="remove" value="1">
+        <button type="submit" class="btn btn-success glyphicon glyphicon-minus"></button>
+      {% endif %}
+    </div>
+  </form>
+</div>

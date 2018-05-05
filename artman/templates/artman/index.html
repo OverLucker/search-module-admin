@@ -36,19 +36,23 @@
           <li class="nav-item active">
             <a class="nav-link" href="{% url 'homepage' %}">Профиль <span class="sr-only">(current)</span></a>
           </li>
+          {% if request.user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'pupilrequest_page' %}">Обучение</a>
+          </li>
+
           {% if request.user.is_staff %}
           <li class="nav-item">
             <a class="nav-link" href="{% url 'moderate_page' %}">Модерировать</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'pupilrequest_page' %}">Обучение</a>
+            <a class="nav-link" href="{% url 'studentsrequest_page' %}">Запросы</a>
           </li>
           {% else %}
-            {% if request.user.is_authenticated %}
             <li class="nav-item">
               <a class="nav-link" href="{% url 'promote_request' %}">Запрос на модерацию</a>
             </li>
-            {% endif %}
+          {% endif %}
           {% endif %}
 
         </ul>

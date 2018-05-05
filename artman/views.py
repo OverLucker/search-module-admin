@@ -106,6 +106,39 @@ class HomeView(LoginRequiredMixin, View):
         return self.get(request)
 
 
+class PupilRequestView(LoginRequiredMixin, View):
+    def get(self, request):
+        teachers = StudentGroup.objects.filter(stud=request.user)
+        requests = PupilsRequest.objects.filter(stud=request.user, status='wait')
+        teachers_pk = chain(
+            map(lambda x: x.prof_id, teachers),
+            map(lambda x: x.prof_id, requests),
+            [request.user.pk]
+        )
+        UserModel = apps.get_model(settings.AUTH_USER_MODEL)
+        all_proffs = UserModel.objects.filter(is_staff=True)
+        return render(request, 'artman/instructors.html', {
+            'teachers': teachers,
+            'proffs': all_proffs.exclude(pk__in=teachers_pk),
+            'requests': requests,
+        })
+
+    def post(self, request):
+        upk = request.POST.get('proff', '-1')
+        UserModel = apps.get_model(settings.AUTH_USER_MODEL)
+        user = get_object_or_404(UserModel, pk=upk)
+        remove = request.POST.get('remove', False)
+        add = request.POST.get('add', False)
+        check = PupilsRequest.objects.filter(prof=user, stud=request.user, status='wait')
+
+        if add and not remove and not check.exists():
+            PupilsRequest.objects.create(prof=user, stud=request.user)
+
+        if remove and not add and check.exists():
+            check.first().delete()
+        return self.get(request)
+
+
 class ModeratorView(LoginRequiredMixin, UserPassesTestMixin, View):
     def test_func(self):
         return self.request.user.is_staff
@@ -142,14 +175,40 @@ class ModeratorView(LoginRequiredMixin, UserPassesTestMixin, View):
         return self.get(request)
 
 
-class PupilRequestView(LoginRequiredMixin, UserPassesTestMixin, View):
+class StudentsView(LoginRequiredMixin, UserPassesTestMixin, View):
     def test_func(self):
         return self.request.user.is_staff
 
     def get(self, request):
-        return render(request, 'artman/pupilrequest.html', {
-            'requests': PupilsRequest.objects.filter(prof=request.user)
+        UserModel = apps.get_model(settings.AUTH_USER_MODEL)
+        students = StudentGroup.objects.filter(prof=request.user).select_related()
+        requests = PupilsRequest.objects.filter(prof=request.user, status='wait').select_related()
+
+        return render(request, 'artman/students.html', {
+            'studs': students,
+            'requests': requests,
         })
+
+    def post(self, request):
+        upk = request.POST.get('stud', '-1')
+        UserModel = apps.get_model(settings.AUTH_USER_MODEL)
+        user = get_object_or_404(UserModel, pk=upk)
+        remove = request.POST.get('remove', False)
+        reject = request.POST.get('reject', False)
+        add = request.POST.get('add', False)
+        check = PupilsRequest.objects.filter(stud=user, prof=request.user, status='wait')
+
+        if not remove and check.exists():
+            req = check.first()
+            if add:
+                req.finish_success()
+            if not add and reject:
+                req.finish_fail()
+
+        if remove:
+            StudentGroup.objects.filter(stud=user, prof=request.user).delete()
+
+        return self.get(request)
 
 
 def promote_view(request):
