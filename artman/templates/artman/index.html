@@ -5,7 +5,7 @@
     <title>{% block title %}Тестовая страница{% endblock %}</title>
      <link href="http://netdna.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" rel="stylesheet">
      <style media="screen">
-       div.m-auto > button[type="submit"] {
+       form > button[type="submit"].glyphicon {
          box-sizing: border-box;
          padding: 0px;
          width: 30px;
@@ -46,7 +46,7 @@
             <a class="nav-link" href="{% url 'moderate_page' %}">Модерировать</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'studentsrequest_page' %}">Запросы</a>
+            <a class="nav-link" href="{% url 'studentsrequest_page' %}">Студенты</a>
           </li>
           {% else %}
             <li class="nav-item">

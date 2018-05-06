@@ -1,21 +1,27 @@
 
 <div class="row mb-2 border-bottom">
-  <form class="form-inline w-100 my-2 my-lg-1" action="." method="post">
-    {% csrf_token %}
-    <input type="hidden" name="article" value="{{ document.pk }}">
-    <input type="hidden" name="user" value="{{ user.pk }}">
-    <div class="col-md-11 col-lg-11">
+    <div class="col-md-10 col-lg-10 my-auto">
       <a href="{{ document.file.url }}">{{ document.title }}</a>
     </div>
-    <div class="col-md-1 col-lg-1 m-auto">
+    <div class="col-md-2 col-lg-2">
       {% if add %}
+      <form class="form-inline w-100 my-1" action="." method="post">
+        {% csrf_token %}
+        <input type="hidden" name="article" value="{{ document.pk }}">
+        <input type="hidden" name="user" value="{{ user.pk }}">
         <input type="hidden" name="add" value="1">
-        <button type="submit" class="btn btn-success glyphicon glyphicon-plus"></button>
+        <button type="submit" class="btn btn-success glyphicon glyphicon-plus m-auto"></button>
+      </form>
       {% endif %}
       {% if remove %}
+      <form class="form-inline w-100 my-1" action="." method="post">
+        {% csrf_token %}
+        <input type="hidden" name="article" value="{{ document.pk }}">
+        <input type="hidden" name="user" value="{{ user.pk }}">
         <input type="hidden" name="remove" value="1">
-        <button type="submit" class="btn btn-success glyphicon glyphicon-minus"></button>
+        <button type="submit" class="btn btn-success glyphicon glyphicon-minus m-auto"></button>
+      </form>
       {% endif %}
     </div>
-  </form>
+
 </div>

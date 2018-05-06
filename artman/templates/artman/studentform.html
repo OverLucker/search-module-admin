@@ -1,7 +1,4 @@
-<div class="row mb-2 border-bottom">
-  <form class="form-inline w-100 my-2 my-lg-1" action="." method="post">
-    {% csrf_token %}
-    <input type="hidden" name="stud" value="{{ user.pk }}">
+<div class="row my-2 border-bottom">
     <div class="col-md-3 col-lg-3 border-right">
       <span>{{ user.username }}</span>
     </div>
@@ -13,26 +10,47 @@
     </div>
     {% if add and reject %}
     <div class="col-md-2 col-lg-2 m-auto">
-      <input type="hidden" name="add" value="1">
-      <button type="submit" class="btn btn-success glyphicon glyphicon-plus"></button>
-      <input type="hidden" name="reject" value="1">
-      <button type="submit" class="btn btn-success glyphicon glyphicon-minus"></button>
+      <form class="d-inline-block my-1" action="." method="post">
+        {% csrf_token %}
+        <input type="hidden" name="stud" value="{{ user.pk }}">
+        <input type="hidden" name="add" value="1">
+        <button type="submit" class="btn btn-success m-auto glyphicon glyphicon-plus"></button>
+      </form>
+      <form class="d-inline-block my-1" action="." method="post">
+        {% csrf_token %}
+        <input type="hidden" name="stud" value="{{ user.pk }}">
+        <input type="hidden" name="reject" value="1">
+        <button type="submit" class="btn btn-success m-auto glyphicon glyphicon-minus"></button>
+      </form>
     </div>
     {% else %}
     <div class="col-md-1 col-lg-1 m-auto">
       {% if add %}
+      <form class="d-inline-block my-1" action="." method="post">
+        {% csrf_token %}
+        <input type="hidden" name="stud" value="{{ user.pk }}">
         <input type="hidden" name="add" value="1">
-        <button type="submit" class="btn btn-success glyphicon glyphicon-plus"></button>
+        <button type="submit" class="btn btn-success m-auto glyphicon glyphicon-minus"></button>
+      </form>
       {% endif %}
       {% if reject %}
+      <form class="d-inline-block my-1" action="." method="post">
+        {% csrf_token %}
+        <input type="hidden" name="stud" value="{{ user.pk }}">
         <input type="hidden" name="reject" value="1">
-        <button type="submit" class="btn btn-success glyphicon glyphicon-plus"></button>
+        <button type="submit" class="btn btn-success m-auto glyphicon glyphicon-minus"></button>
+      </form>
       {% endif %}
       {% if remove %}
+      <form class="d-inline-block my-1" action="." method="post">
+        {% csrf_token %}
+        <input type="hidden" name="stud" value="{{ user.pk }}">
         <input type="hidden" name="remove" value="1">
         <button type="submit" class="btn btn-success glyphicon glyphicon-minus"></button>
+      </form>
       {% endif %}
+      </form>
     </div>
     {% endif %}
-  </form>
+
 </div>

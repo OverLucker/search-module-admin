@@ -1,25 +1,30 @@
 <div class="row mb-2 border-bottom">
-  <form class="form-inline w-100 my-2 my-lg-1" action="." method="post">
-    {% csrf_token %}
-    <input type="hidden" name="proff" value="{{ user.pk }}">
-    <div class="col-md-3 col-lg-3 border-right">
+    <div class="col-md-3 col-lg-3 my-1 border-right">
       <span>{{ user.username }}</span>
     </div>
-    <div class="col-md-4 col-lg-4">
+    <div class="col-md-4 col-lg-4 my-1">
       <span>{{ user.first_name }}</span>
     </div>
-    <div class="col-md-4 col-lg-4">
+    <div class="col-md-4 col-lg-4 my-1">
       <span>{{ user.last_name }}</span>
     </div>
-    <div class="col-md-1 col-lg-1 m-auto">
+    <div class="col-md-1 col-lg-1">
       {% if add %}
+      <form class="form-inline my-1" action="." method="post">
+        {% csrf_token %}
+        <input type="hidden" name="proff" value="{{ user.pk }}">
         <input type="hidden" name="add" value="1">
-        <button type="submit" class="btn btn-success glyphicon glyphicon-plus"></button>
+        <button type="submit" class="btn btn-success glyphicon glyphicon-plus m-auto"></button>
+      </form>
       {% endif %}
       {% if remove %}
+      <form class="form-inline my-1" action="." method="post">
+        {% csrf_token %}
+        <input type="hidden" name="proff" value="{{ user.pk }}">
         <input type="hidden" name="remove" value="1">
-        <button type="submit" class="btn btn-success glyphicon glyphicon-minus"></button>
+        <button type="submit" class="btn btn-success glyphicon glyphicon-minus m-auto"></button>
+      </form>
       {% endif %}
     </div>
-  </form>
+
 </div>
